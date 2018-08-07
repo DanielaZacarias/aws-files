@@ -1,0 +1,35 @@
+version: '3'
+services:
+  jmaster:
+    image: chuymarin/jenkins-swarm
+    volumes:
+      - "jenkins_vol:/var/jenkins_home"
+    ports:
+      - "8082:8080"
+#      - "50000:50000"
+    environment:
+      - JENKINS_OPTS="--prefix=/jenkins"
+
+  nginx:
+    image: danielazacarias/nginx
+    ports:
+      - "80:80"
+
+  agent:
+    image: chuymarin/jenkins-swarm-slave
+    command: -username jenkins -password jenkins -executors 1
+    environment:
+      - "JENKINS_PORT_8080_TCP_ADDR=jmaster"
+      - "JENKINS_PORT_8080_TCP_PORT=8080/jenkins" 
+    ports:
+      - "50000:50000"
+
+#  jenkins_a2:
+#    build: jenkins_a2/.
+#    command: -username jenkins -password jenkins -executors 1
+#    environment:
+#      - "JENKINS_PORT_8080_TCP_ADDR=jmaster"
+#      - "JENKINS_PORT_8080_TCP_PORT=8080/jenkins"
+
+volumes:
+  jenkins_vol:
